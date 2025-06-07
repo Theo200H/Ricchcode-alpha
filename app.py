@@ -563,7 +563,7 @@
                     </div>
                 </div>
                 
-                ${results.suggestions_optimisation.length > 0 ? `
+                ${Array.isArray(results.suggestions_optimisation) && results.suggestions_optimisation.length > 0 ? `
                 <div class="results-card">
                     <h4 style="margin-bottom: 15px; color: #2d3748;">💡 Suggestions d'Optimisation</h4>
                     <ul class="suggestions-list">
