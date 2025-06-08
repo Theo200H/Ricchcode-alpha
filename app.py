@@ -154,62 +154,162 @@ def predict_engagement(viral_score: float, platform: str) -> Dict:
         "confiance": int(min(95, max(60, viral_score * 8 + random.uniform(-5, 5))))
     }
 
-def generate_suggestions(text: str, platform: str, viral_score: float) -> List[str]:
-    """Generate optimization suggestions"""
+def generate_suggestions(text: str, platform: str, viral_score: float) -> List[Dict[str, str]]:
+    """Generate specific optimization suggestions with concrete examples"""
     suggestions = []
     
     # Check for hashtags
     hashtag_count = len(re.findall(r'#\w+', text))
     if hashtag_count == 0:
-        suggestions.append(f"Ajoutez des hashtags pertinents pour {platform}")
+        platform_hashtags = {
+            "instagram": "#instagood #photooftheday #lifestyle #motivation",
+            "twitter": "#Thread #TwitterTips #SocialMedia",
+            "tiktok": "#fyp #foryou #viral #trending",
+            "youtube": "#YouTube #Subscribe #Tutorial",
+            "facebook": "#famille #partage #memories",
+            "linkedin": "#leadership #business #networking #career",
+            "general": "#viral #trending #share"
+        }
+        hashtags = platform_hashtags.get(platform, platform_hashtags["general"])
+        suggestions.append({
+            "type": "hashtags",
+            "suggestion": f"Ajoutez ces hashtags populaires : {hashtags}",
+            "example": f'"{text.strip()} {hashtags}"'
+        })
     elif hashtag_count > 10:
-        suggestions.append("Réduisez le nombre de hashtags (maximum 5-10)")
+        suggestions.append({
+            "type": "hashtags",
+            "suggestion": "Réduisez à 3-5 hashtags maximum pour éviter le spam",
+            "example": "Gardez seulement les hashtags les plus pertinents"
+        })
     
     # Check for emojis
     emoji_pattern = re.compile(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF\U00002700-\U000027BF\U0001F900-\U0001F9FF]')
     if not emoji_pattern.search(text):
-        suggestions.append("Ajoutez des emojis pour rendre le contenu plus attractif")
+        platform_emojis = {
+            "instagram": "📸✨💫",
+            "twitter": "🧵💭🔥",
+            "tiktok": "👀🎵💃",
+            "youtube": "📺🎬🔔",
+            "facebook": "❤️👨‍👩‍👧‍👦💭",
+            "linkedin": "💼🎯📊",
+            "general": "🔥💡✨"
+        }
+        emojis = platform_emojis.get(platform, platform_emojis["general"])
+        words = text.split()
+        if len(words) > 3:
+            example_text = ' '.join(words[:3]) + f' {emojis[0]} ' + ' '.join(words[3:])
+        else:
+            example_text = f"{text.strip()} {emojis}"
+        
+        suggestions.append({
+            "type": "emojis",
+            "suggestion": f"Ajoutez des emojis pertinents : {emojis}",
+            "example": f'"{example_text}"'
+        })
     
     # Check for call to action
-    cta_words = ['cliquez', 'abonnez', 'partagez', 'commentez', 'likez', 'suivez']
+    cta_words = ['cliquez', 'abonnez', 'partagez', 'commentez', 'likez', 'suivez', 'découvrez']
     if not any(word in text.lower() for word in cta_words):
-        suggestions.append("Incluez un appel à l'action clair")
+        platform_ctas = {
+            "instagram": "👆 Double-tap si tu es d'accord ! Partage en story pour tes amis !",
+            "twitter": "🔄 RT si vous êtes d'accord ! Suivez-moi pour plus de conseils !",
+            "tiktok": "❤️ Like si ça t'a aidé ! Abonne-toi pour plus d'astuces !",
+            "youtube": "👍 Likez cette vidéo et abonnez-vous ! Activez la 🔔 !",
+            "facebook": "👍 Réagissez et partagez avec vos amis ! Commentez votre avis !",
+            "linkedin": "💭 Qu'en pensez-vous ? Partagez votre expérience en commentaire !",
+            "general": "💬 Partagez votre avis en commentaire ! Likez si ça vous plaît !"
+        }
+        cta = platform_ctas.get(platform, platform_ctas["general"])
+        suggestions.append({
+            "type": "cta",
+            "suggestion": "Ajoutez un appel à l'action engageant",
+            "example": f'"{text.strip()}\n\n{cta}"'
+        })
     
     # Check for questions
     if '?' not in text:
-        suggestions.append("Posez une question pour encourager l'engagement")
+        question_examples = {
+            "instagram": "Et vous, quelle est votre astuce préférée ? 🤔",
+            "twitter": "Êtes-vous d'accord avec cette approche ? 🤔",
+            "tiktok": "Qui d'autre fait ça ? 👀",
+            "youtube": "Avez-vous déjà essayé cette méthode ?",
+            "facebook": "Qui se reconnaît dans cette situation ? 😅",
+            "linkedin": "Quelle est votre stratégie dans ce domaine ?",
+            "general": "Qu'en pensez-vous ? 💭"
+        }
+        question = question_examples.get(platform, question_examples["general"])
+        suggestions.append({
+            "type": "question",
+            "suggestion": "Posez une question pour stimuler l'engagement",
+            "example": f'"{text.strip()}\n\n{question}"'
+        })
     
-    # Platform-specific suggestions
+    # Platform-specific improvements
     if platform == "instagram":
         if len(text) > 300:
-            suggestions.append("Raccourcissez le texte pour Instagram (optimal: 50-200 caractères)")
-        if not re.search(r'#\w+', text):
-            suggestions.append("Utilisez des hashtags populaires comme #instagood #photooftheday")
+            # Provide a shortened version
+            short_text = text[:150] + "... ✨"
+            suggestions.append({
+                "type": "length",
+                "suggestion": "Version raccourcie pour Instagram (optimal: 50-200 caractères)",
+                "example": f'"{short_text}"'
+            })
     
     elif platform == "twitter":
         if len(text) > 280:
-            suggestions.append("Respectez la limite de 280 caractères de Twitter")
-        if not text.startswith(('Thread', '🧵')):
-            suggestions.append("Considérez créer un thread pour plus de contenu")
+            # Create a thread version
+            suggestions.append({
+                "type": "thread",
+                "suggestion": "Créez un thread Twitter pour respecter la limite",
+                "example": f'"🧵 Thread : {text[:150]}...\n\n1/{len(text)//150 + 1}"'
+            })
     
     elif platform == "tiktok":
         if 'POV' not in text.upper():
-            suggestions.append("Utilisez des formats populaires comme 'POV:' pour TikTok")
-        if '#fyp' not in text.lower():
-            suggestions.append("Ajoutez #fyp #foryou pour la visibilité")
+            suggestions.append({
+                "type": "format",
+                "suggestion": "Utilisez le format POV populaire sur TikTok",
+                "example": f'"POV: {text.lower()}"'
+            })
     
     elif platform == "youtube":
         if len(text) < 100:
-            suggestions.append("Développez la description pour YouTube (optimal: 100-300 caractères)")
-        if 'abonnez' not in text.lower():
-            suggestions.append("Demandez aux viewers de s'abonner et d'activer les notifications")
+            expanded_text = f"{text} Dans cette vidéo, découvrez tous mes conseils pour réussir ! N'oubliez pas de vous abonner et d'activer les notifications 🔔"
+            suggestions.append({
+                "type": "description",
+                "suggestion": "Développez la description pour YouTube",
+                "example": f'"{expanded_text}"'
+            })
     
-    # Score-based suggestions
-    if viral_score < 5:
-        suggestions.append("Utilisez des mots plus accrocheurs et émotionnels")
-        suggestions.append("Créez un sentiment d'urgence ou d'exclusivité")
+    elif platform == "facebook":
+        if not any(word in text.lower() for word in ['famille', 'amis', 'souvenirs', 'partage']):
+            suggestions.append({
+                "type": "community",
+                "suggestion": "Créez un sentiment de communauté",
+                "example": f'"{text.strip()}\n\nPartagez cette publication avec vos amis et famille ! 👨‍👩‍👧‍👦"'
+            })
     
-    return suggestions[:5]  # Limit to 5 suggestions
+    elif platform == "linkedin":
+        if not text.startswith(('💡', '🎯', '📊')):
+            suggestions.append({
+                "type": "professional",
+                "suggestion": "Commencez par un emoji professionnel",
+                "example": f'"💡 Insight: {text}"'
+            })
+    
+    # Score-based enhancements
+    if viral_score < 6:
+        power_words = ["secret", "incroyable", "révélé", "exclusif", "gratuit", "rapide"]
+        if not any(word in text.lower() for word in power_words):
+            enhanced_text = f"🔥 SECRET RÉVÉLÉ : {text}"
+            suggestions.append({
+                "type": "power_words",
+                "suggestion": "Utilisez des mots puissants pour plus d'impact",
+                "example": f'"{enhanced_text}"'
+            })
+    
+    return suggestions[:4]  # Limit to 4 specific suggestions
 
 # App header
 st.title("🚀 RicchCode Pro")
@@ -311,7 +411,11 @@ if lancer and texte.strip():
     if suggestions:
         st.subheader("💡 Suggestions d'optimisation")
         for i, suggestion in enumerate(suggestions, 1):
-            st.info(f"✨ **{i}.** {suggestion}")
+            with st.expander(f"✨ **{i}.** {suggestion['suggestion']}", expanded=True):
+                st.markdown("**Exemple concret :**")
+                st.code(suggestion['example'], language="text")
+                if st.button(f"📋 Copier suggestion {i}", key=f"copy_{i}"):
+                    st.success("✅ Copié ! (Utilisez Ctrl+V pour coller)")
     
     # Performance indicators
     st.markdown("---")
