@@ -1,5 +1,3 @@
-# Version Streamlit de RicchCode Alpha (fonctionne sur Streamlit Cloud)
-
 import streamlit as st
 import datetime
 
@@ -34,16 +32,29 @@ with st.expander("📊 Statut du système"):
 
 st.markdown("---")
 
+exemples = {
+    "": ("", "general"),
+    "Instagram": ("Découvrez cette astuce incroyable pour devenir viral ! 🔥 #marketing #viral #tips", "instagram"),
+    "Twitter": ("Thread 🧵 Les 5 secrets pour créer du contenu viral que personne ne vous dit jamais !", "twitter"),
+    "TikTok": ("POV: Tu découvres la technique secrète pour 1M de vues 👀 #fyp #viral #tiktok", "tiktok"),
+    "YouTube": ("Dans cette vidéo, je vais vous révéler comment jai réussi à gagner 100k abonnés en 30 jours ! Abonnez-vous pour plus de conseils !", "youtube"),
+    "Contenu Neutre": ("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua", "general")
+}
+
+selected_test = st.selectbox("🧪 Choisir un exemple rapide (optionnel) :", list(exemples.keys()))
+pre_text, pre_platform = exemples[selected_test]
+
 with st.form("analyse_form"):
     st.subheader("📝 Analyser un contenu")
-    texte = st.text_area("Texte du contenu :", height=150)
-    plateforme = st.selectbox("Plateforme :", ["general", "instagram", "twitter", "tiktok", "youtube", "facebook", "linkedin"])
+    texte = st.text_area("Texte du contenu :", value=pre_text, height=150)
+    plateformes_disponibles = ["general", "instagram", "twitter", "tiktok", "youtube", "facebook", "linkedin"]
+    index_plateforme = plateformes_disponibles.index(pre_platform) if pre_platform in plateformes_disponibles else 0
+    plateforme = st.selectbox("Plateforme :", plateformes_disponibles, index=index_plateforme)
     user_id = st.text_input("ID Utilisateur (optionnel) :")
     submitted = st.form_submit_button("🔍 Analyser le Contenu")
 
 if submitted and texte.strip():
     with st.spinner("Analyse en cours..."):
-        # Simulation de prédiction (à remplacer par vraie logique plus tard)
         score_viral = 7.3
         score_sentiment = 0.42
         score_lisibilite = 6.8
@@ -86,25 +97,3 @@ if submitted and texte.strip():
 
 elif submitted:
     st.warning("⚠️ Veuillez entrer du texte pour l'analyse.")
-
-st.markdown("---")
-st.subheader("🧪 Tests Rapides")
-col1, col2, col3, col4, col5 = st.columns(5)
-
-exemples = [
-    ("Découvrez cette astuce incroyable pour devenir viral ! 🔥 #marketing #viral #tips", "instagram"),
-    ("Thread 🧵 Les 5 secrets pour créer du contenu viral que personne ne vous dit jamais !", "twitter"),
-    ("POV: Tu découvres la technique secrète pour 1M de vues 👀 #fyp #viral #tiktok", "tiktok"),
-    ("Dans cette vidéo, je vais vous révéler comment jai réussi à gagner 100k abonnés en 30 jours ! Abonnez-vous pour plus de conseils !", "youtube"),
-    ("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua", "general")
-]
-
-for i, (txt, pf) in enumerate(exemples):
-    if i == 0: btn = col1
-    elif i == 1: btn = col2
-    elif i == 2: btn = col3
-    elif i == 3: btn = col4
-    else: btn = col5
-
-    if btn.button(f"Test {pf.capitalize()}"):
-        st.experimental_rerun()
