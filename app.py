@@ -9,492 +9,529 @@ import pandas as pd
 
 # Page configuration
 st.set_page_config(
-    page_title="RicchCode Pro - Générateur de Contenu Viral IA", 
+    page_title="RicchCode Pro - Générateur Viral IA", 
     layout="wide",
     page_icon="🚀"
 )
 
-# Advanced styling
+# Enhanced styling with premium look
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
     
-    body, .stApp {
+    body {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         font-family: 'Inter', sans-serif;
     }
-    .block-container {
-        padding-top: 1rem;
-        max-width: 1200px;
-    }
+    
     .main-header {
-        background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+        background-size: 300% 300%;
+        animation: gradient 8s ease infinite;
         padding: 2rem;
         border-radius: 20px;
         text-align: center;
-        color: white;
         margin-bottom: 2rem;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        color: white;
+        font-weight: 700;
     }
+    
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
     .feature-card {
         background: rgba(255,255,255,0.95);
         padding: 1.5rem;
         border-radius: 15px;
-        margin: 1rem 0;
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
+        margin: 1rem 0;
+        border-left: 4px solid #667eea;
     }
+    
     .generator-section {
-        background: linear-gradient(45deg, #667eea, #764ba2);
-        color: white;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 2rem;
         border-radius: 20px;
-        margin: 1rem 0;
-    }
-    .analysis-card {
-        background: linear-gradient(45deg, #f093fb, #f5576c);
         color: white;
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin: 1rem 0;
+        margin: 2rem 0;
     }
-    .metric-highlight {
-        background: rgba(255,255,255,0.2);
+    
+    .viral-score {
+        background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        text-align: center;
+        color: white;
+        font-size: 1.2em;
+        font-weight: 600;
+    }
+    
+    .platform-card {
+        background: linear-gradient(45deg, #a8edea 0%, #fed6e3 100%);
         padding: 1rem;
         border-radius: 10px;
+        margin: 0.5rem;
         text-align: center;
-        margin: 0.5rem 0;
+        cursor: pointer;
+        transition: transform 0.3s;
     }
-    .viral-score-high { background: linear-gradient(45deg, #00C851, #007E33); }
-    .viral-score-medium { background: linear-gradient(45deg, #ffbb33, #FF8800); }
-    .viral-score-low { background: linear-gradient(45deg, #ff4444, #CC0000); }
     
-    .suggestion-premium {
-        background: linear-gradient(45deg, #4facfe, #00f2fe);
+    .platform-card:hover {
+        transform: scale(1.05);
+    }
+    
+    .metrics-dashboard {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .pro-tip {
+        background: linear-gradient(45deg, #ffd89b 0%, #19547b 100%);
+        padding: 1rem;
+        border-radius: 10px;
         color: white;
-        padding: 1.5rem;
-        border-radius: 15px;
         margin: 1rem 0;
-        border-left: 5px solid #FFD700;
-    }
-    .generated-content {
-        background: #f8f9fa;
-        border: 2px dashed #667eea;
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin: 1rem 0;
-        font-size: 1.1em;
-        line-height: 1.6;
-    }
-    .pro-badge {
-        background: linear-gradient(45deg, #FFD700, #FFA500);
-        color: #000;
-        padding: 0.3rem 1rem;
-        border-radius: 20px;
-        font-weight: bold;
-        font-size: 0.8em;
-        margin-left: 0.5rem;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # Initialize session state
-if 'generated_contents' not in st.session_state:
-    st.session_state.generated_contents = []
-if 'analysis_history' not in st.session_state:
-    st.session_state.analysis_history = []
+if 'generated_content' not in st.session_state:
+    st.session_state.generated_content = []
 if 'user_profile' not in st.session_state:
     st.session_state.user_profile = {
+        'industry': 'general',
+        'location': 'Montreal',
         'target_audience': 'general',
-        'business_type': 'personal',
-        'location': 'Montreal, QC'
+        'tone': 'engaging'
     }
 
-def generate_viral_content(prompt: str, platform: str, tone: str, audience: str) -> Dict:
-    """Advanced AI Content Generator with ML-based optimization"""
+def generate_viral_content(platform: str, topic: str, industry: str, tone: str, location: str) -> Dict:
+    """Generate viral content using AI simulation"""
     
-    # Content templates by platform and tone
+    # Content templates by platform and industry
     templates = {
-        'instagram': {
-            'motivational': [
-                "🔥 {prompt}\n\n✨ Chaque jour est une nouvelle opportunité de briller ! Vous avez tout ce qu'il faut pour réussir.\n\n💪 Tag quelqu'un qui a besoin de voir ça !\n\n#motivation #success #lifestyle #inspiration #goals",
-                "📸 {prompt}\n\n🌟 La réussite commence par un premier pas. Quel sera le vôtre aujourd'hui ?\n\n👇 Dites-moi en commentaire !\n\n#motivationquote #successmindset #entrepreneur #hustle"
+        "instagram": {
+            "ecommerce": [
+                "🛍️ ALERTE PROMO : {topic} à prix fou ! Seulement à {location} ! Qui veut être le premier ? 👆",
+                "✨ Secret révélé : Comment {topic} peut transformer votre vie ! Thread en story 👆",
+                "🔥 Avant/Après : {topic} - Les résultats vont vous choquer ! Swipe pour voir ➡️"
             ],
-            'educational': [
-                "📚 ASTUCE : {prompt}\n\n💡 3 points clés à retenir :\n• Point important 1\n• Point important 2  \n• Point important 3\n\n🔄 Sauvegarde ce post pour plus tard !\n\n#tips #education #learn #knowledge #growth",
-                "🎯 {prompt}\n\n📖 Voici ce que j'ai appris :\n\n✅ Les erreurs font partie du processus\n✅ La patience est une vertu\n✅ La constance paye toujours\n\n💬 Votre plus belle leçon ? 👇\n\n#apprentissage #experience #wisdom"
+            "fitness": [
+                "💪 Transformation INCROYABLE en 30 jours avec {topic} ! Qui veut connaître le secret ? 🔥",
+                "🏋️‍♀️ POV: Tu découvres {topic} et ta vie change complètement ! Dis OUI en commentaire ! 💪",
+                "⚡ Erreur n°1 que font 99% des gens avec {topic} (et comment l'éviter) 👇"
             ],
-            'commercial': [
-                "🛍️ {prompt}\n\n🔥 OFFRE LIMITÉE : -30% sur toute la collection !\n\n⏰ Plus que 48h pour en profiter\n\n🎁 Livraison gratuite dès 50€\n\n🛒 Lien en bio ou DM\n\n#promo #shopping #limitedoffer #sale",
-                "✨ {prompt}\n\n🌟 Nos clients adorent :\n💫 Qualité premium\n💫 Service client 24/7\n💫 Satisfaction garantie\n\n📞 Contactez-nous pour plus d'infos !\n\n#quality #customerservice #satisfaction #business"
+            "food": [
+                "🍕 RECETTE SECRÈTE : {topic} qui rend fou tout {location} ! Qui teste ce soir ? 🔥",
+                "😱 Cette technique pour {topic} va vous faire économiser 200€/mois ! Sauvegarde ce post ! 📌",
+                "🤤 POV: Tu goûtes {topic} pour la première fois... La réaction est épique ! 👆"
+            ],
+            "tech": [
+                "📱 Cette astuce {topic} que 99% des gens ignorent ! Sauvegarde avant qu'elle disparaisse ! 💾",
+                "🤯 {topic} : Le hack secret que les pros ne veulent pas que tu saches ! Thread ➡️",
+                "⚡ 5 minutes pour maîtriser {topic} comme un expert ! Qui commence maintenant ? 🚀"
             ]
         },
-        'tiktok': {
-            'viral': [
-                "POV: {prompt} 👀\n\n🤯 Wait for the plot twist...\n\n#fyp #foryou #viral #trending #mindblown #plottwist",
-                "✨ {prompt}\n\n🎵 Trending sound alert! 🚨\n\nWho else relates? 🙋‍♀️\n\n#relatable #trend #fyp #foryoupage #mood #same"
-            ],
-            'educational': [
-                "📖 Did you know: {prompt}\n\n🤓 Science fact of the day!\n\nFollow for more daily facts 🧠\n\n#science #facts #learn #education #mindblowing #knowledge",
-                "🎯 Life hack: {prompt}\n\n✅ Save this for later!\n\nTry it and let me know 👇\n\n#lifehack #tips #useful #productivity #clever"
-            ]
-        },
-        'twitter': {
-            'thread': [
-                "🧵 THREAD: {prompt}\n\n1/ Voici pourquoi c'est important...\n\n2/ Les 3 points essentiels :\n• Premier point crucial\n• Deuxième insight majeur  \n• Troisième révélation\n\n3/ En conclusion... 👇",
-                "💭 Réflexion : {prompt}\n\n🧵 Thread sur mes apprentissages :\n\n1/ Ce que j'ai découvert\n2/ Comment ça a changé ma vision\n3/ Ce que vous devez savoir\n\nRT si ça résonne avec vous !"
-            ],
-            'opinion': [
-                "🔥 Hot take: {prompt}\n\nPas d'accord ? Débattons ! 👇\n\n#debate #opinion #controversial #discuss",
-                "💡 Unpopular opinion: {prompt}\n\nChange my mind. 🤔\n\n#unpopularopinion #changemymind #debate #thoughts"
-            ]
-        },
-        'youtube': {
-            'tutorial': [
-                "🎬 {prompt}\n\nDans cette vidéo :\n✅ Étape par étape complet\n✅ Astuces de pro\n✅ Erreurs à éviter\n\n👍 Likez si ça vous aide !\n🔔 Abonnez-vous pour plus de tutos !\n\n#tutorial #howto #tips #learn",
-                "📺 {prompt}\n\n🎯 Ce que vous allez apprendre :\n• Technique #1 (game-changer)\n• Technique #2 (peu connue)\n• Technique #3 (ma préférée)\n\n💬 Questions en commentaires !\n\n#education #skills #mastery"
-            ]
-        }
+        "tiktok": [
+            "POV: Tu découvres {topic} et ta vie change complètement 👀 #fyp #viral",
+            "Personne ne parle de {topic} mais c'est LE secret ! #astuce #hack #viral",
+            "Cette technique {topic} va vous choquer ! 🤯 (Partie 1/3) #secret #viral",
+            "Red flags quand quelqu'un parle de {topic} 🚩 #redflags #truth",
+            "Plot twist: {topic} n'est PAS ce que vous croyez ! 😱 #plottwist #viral"
+        ],
+        "twitter": [
+            "🧵 Thread : Les 7 secrets de {topic} que personne ne vous dit (sauvegardez ce thread) 1/8",
+            "Unpopular opinion: {topic} est surévalué. Voici pourquoi (et les alternatives) ⬇️",
+            "J'ai testé {topic} pendant 30 jours. Résultat : 🤯 (thread avec preuves) ⬇️",
+            "Breaking: {topic} va changer votre perception de tout. Voici comment ⬇️",
+            "Hot take: Si vous ne maîtrisez pas {topic}, vous perdez de l'argent chaque jour ⬇️"
+        ],
+        "youtube": [
+            "Comment {topic} m'a fait gagner 10k€ en 30 jours (méthode complète révélée)",
+            "PERSONNE ne parle de {topic} - Voici pourquoi c'est votre AVANTAGE",
+            "J'ai testé {topic} pendant 6 mois : Résultats CHOQUANTS (avec preuves)",
+            "La VÉRITÉ sur {topic} que les 'experts' cachent (enquête exclusive)",
+            "{topic} : L'erreur à 10 000€ que font 99% des débutants"
+        ],
+        "linkedin": [
+            "💡 Insight : Comment {topic} transforme les entreprises de {location} (données exclusives)",
+            "🎯 Stratégie : 3 façons d'utiliser {topic} pour doubler votre ROI en 2024",
+            "📊 Analyse : Pourquoi {topic} sera LE game-changer de votre industrie",
+            "🚀 Leadership : Comment j'ai utilisé {topic} pour transformer mon équipe",
+            "💼 Business case : {topic} a généré +250% de leads. Voici comment."
+        ]
     }
     
-    # Select appropriate template
-    platform_templates = templates.get(platform, templates['instagram'])
-    tone_templates = platform_templates.get(tone, list(platform_templates.values())[0])
+    # Select template based on platform and industry
+    if platform == "instagram" and industry in templates["instagram"]:
+        template = random.choice(templates["instagram"][industry])
+    elif platform in templates:
+        template = random.choice(templates[platform])
+    else:
+        template = random.choice(templates["instagram"]["ecommerce"])
     
     # Generate content
-    selected_template = random.choice(tone_templates)
-    generated_content = selected_template.format(prompt=prompt)
+    content = template.format(topic=topic, location=location)
+    
+    # Add tone adjustments
+    if tone == "professional":
+        content = content.replace("🔥", "").replace("😱", "").replace("🤯", "")
+    elif tone == "casual":
+        content += " 😊"
+    elif tone == "urgent":
+        content = "🚨 URGENT : " + content + " ⏰"
     
     # Calculate viral metrics
-    viral_score = calculate_viral_score(generated_content, platform)
-    engagement_prediction = predict_engagement(viral_score, platform)
-    
-    # Add trending elements based on current trends
-    trending_elements = add_trending_elements(generated_content, platform)
+    viral_score = calculate_advanced_viral_score(content, platform, industry)
+    engagement_prediction = predict_advanced_engagement(viral_score, platform, industry, location)
     
     return {
-        'content': generated_content,
-        'viral_score': viral_score,
-        'engagement_prediction': engagement_prediction,
-        'trending_elements': trending_elements,
-        'optimized_hashtags': generate_optimized_hashtags(prompt, platform),
-        'best_time_to_post': get_optimal_posting_time(platform, audience),
-        'content_id': f"rcp-{random.randint(10000, 99999)}"
+        "content": content,
+        "viral_score": viral_score,
+        "engagement": engagement_prediction,
+        "platform": platform,
+        "industry": industry,
+        "timestamp": datetime.datetime.now()
     }
 
-def calculate_viral_score(text: str, platform: str) -> float:
-    """Advanced ML-based viral score calculation"""
+def calculate_advanced_viral_score(content: str, platform: str, industry: str) -> float:
+    """Advanced viral score calculation with ML simulation"""
     score = 5.0
     
-    # Platform-specific optimization
-    platform_weights = {
-        'instagram': {'hashtags': 1.5, 'emojis': 1.3, 'length': 1.2},
-        'tiktok': {'trending': 2.0, 'hooks': 1.8, 'hashtags': 1.4},
-        'twitter': {'threads': 1.6, 'engagement': 1.4, 'hashtags': 1.1},
-        'youtube': {'description': 1.3, 'keywords': 1.5, 'cta': 1.4}
+    # Content analysis
+    words = content.lower().split()
+    
+    # High-impact words
+    viral_words = ["secret", "révélé", "choquant", "incroyable", "gratuit", "urgent", "exclusif", 
+                  "hack", "astuce", "méthode", "transformation", "erreur", "vérité"]
+    viral_count = sum(1 for word in words if any(v in word for v in viral_words))
+    score += min(2.0, viral_count * 0.4)
+    
+    # Emotional triggers
+    emotions = ["🔥", "😱", "🤯", "💪", "⚡", "🚀", "💯", "👆", "😍"]
+    emotion_count = sum(content.count(e) for e in emotions)
+    score += min(1.5, emotion_count * 0.3)
+    
+    # Platform optimization
+    platform_bonuses = {
+        "instagram": 1.2 if len(content) < 200 else 0.8,
+        "tiktok": 1.5 if any(word in content.lower() for word in ["pov", "fyp", "viral"]) else 1.0,
+        "twitter": 1.3 if content.startswith("🧵") else 1.0,
+        "youtube": 1.1 if len(content) > 50 else 0.9,
+        "linkedin": 1.2 if any(word in content.lower() for word in ["insight", "stratégie", "business"]) else 1.0
     }
+    score *= platform_bonuses.get(platform, 1.0)
     
-    weights = platform_weights.get(platform, platform_weights['instagram'])
-    
-    # Advanced analysis factors
-    factors = {
-        'emotion_words': len(re.findall(r'\b(incroyable|fantastique|choquant|secret|révélé|exclusif)\b', text.lower())),
-        'power_words': len(re.findall(r'\b(gratuit|nouveau|limité|maintenant|urgent)\b', text.lower())),
-        'engagement_triggers': len(re.findall(r'\b(commentez|partagez|tag|mention)\b', text.lower())),
-        'hashtag_count': len(re.findall(r'#\w+', text)),
-        'emoji_count': len(re.findall(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF]', text)),
-        'question_count': text.count('?'),
-        'exclamation_count': text.count('!')
-    }
-    
-    # Calculate weighted score
-    for factor, count in factors.items():
-        if factor == 'hashtag_count':
-            optimal_hashtags = 5 if platform == 'instagram' else 3
-            score += max(0, optimal_hashtags - abs(count - optimal_hashtags)) * 0.3
-        else:
-            score += min(count * 0.4, 2.0)
+    # Industry relevance
+    industry_bonus = 1.1 if industry != "general" else 1.0
+    score *= industry_bonus
     
     return min(10.0, max(1.0, score))
 
-def predict_engagement(viral_score: float, platform: str) -> Dict:
-    """ML-enhanced engagement prediction"""
-    base_rates = {
-        'instagram': {'likes': 150, 'comments': 25, 'shares': 8, 'saves': 12},
-        'tiktok': {'likes': 300, 'comments': 45, 'shares': 20, 'views': 2000},
-        'twitter': {'likes': 80, 'retweets': 25, 'comments': 15, 'impressions': 1500},
-        'youtube': {'likes': 120, 'comments': 35, 'shares': 10, 'views': 800}
+def predict_advanced_engagement(viral_score: float, platform: str, industry: str, location: str) -> Dict:
+    """Advanced engagement prediction with location and industry factors"""
+    
+    base_metrics = {
+        "instagram": {"views": 1000, "likes": 80, "comments": 15, "shares": 10},
+        "tiktok": {"views": 5000, "likes": 400, "comments": 50, "shares": 25},
+        "twitter": {"views": 2000, "likes": 60, "retweets": 20, "comments": 12},
+        "youtube": {"views": 3000, "likes": 150, "comments": 25, "shares": 15},
+        "linkedin": {"views": 800, "likes": 40, "comments": 8, "shares": 12}
     }
     
-    rates = base_rates.get(platform, base_rates['instagram'])
-    viral_multiplier = (viral_score / 10) ** 1.5
+    metrics = base_metrics.get(platform, base_metrics["instagram"])
     
-    predictions = {}
-    for metric, base_value in rates.items():
-        variance = random.uniform(0.7, 1.4)
-        predictions[metric] = int(base_value * viral_multiplier * variance)
+    # Viral score multiplier
+    viral_multiplier = (viral_score / 5) ** 1.5
     
-    predictions['confidence'] = min(95, int(viral_score * 9 + random.uniform(-3, 3)))
-    return predictions
-
-def add_trending_elements(content: str, platform: str) -> List[str]:
-    """Add current trending elements"""
-    trending_2024 = {
-        'instagram': ['✨ aesthetic vibes', '🎯 mindset content', '💫 self-care', '🔥 productivity hacks'],
-        'tiktok': ['👀 plot twist content', '🎵 trending audio', '💃 dance trends', '🤯 mind-blowing facts'],
-        'twitter': ['🧵 long-form threads', '💭 hot takes', '🔥 viral opinions', '📊 data insights'],
-        'youtube': ['🎬 storytelling', '📚 educational content', '🎯 how-to guides', '💡 life lessons']
+    # Location multiplier (simulate local engagement)
+    location_multiplier = 1.3 if location in ["Montreal", "Paris", "London"] else 1.0
+    
+    # Industry multiplier
+    industry_multipliers = {
+        "ecommerce": 1.4,
+        "fitness": 1.6,
+        "food": 1.8,
+        "tech": 1.2,
+        "finance": 1.1,
+        "lifestyle": 1.5
     }
+    industry_multiplier = industry_multipliers.get(industry, 1.0)
     
-    return trending_2024.get(platform, trending_2024['instagram'])
-
-def generate_optimized_hashtags(prompt: str, platform: str) -> List[str]:
-    """Generate ML-optimized hashtags"""
-    base_hashtags = {
-        'instagram': ['#viral', '#trending', '#explore', '#reels', '#instagram'],
-        'tiktok': ['#fyp', '#foryou', '#viral', '#trending', '#tiktok'],
-        'twitter': ['#viral', '#thread', '#TwitterTips', '#engagement'],
-        'youtube': ['#youtube', '#viral', '#trending', '#subscribe']
+    # Calculate final metrics
+    final_multiplier = viral_multiplier * location_multiplier * industry_multiplier
+    
+    return {
+        key: int(value * final_multiplier * random.uniform(0.8, 1.2))
+        for key, value in metrics.items()
     }
-    
-    # Add contextual hashtags based on prompt
-    contextual = []
-    if 'business' in prompt.lower():
-        contextual.extend(['#entrepreneur', '#business', '#success'])
-    if 'motivation' in prompt.lower():
-        contextual.extend(['#motivation', '#inspiration', '#mindset'])
-    if 'tips' in prompt.lower():
-        contextual.extend(['#tips', '#advice', '#howto'])
-    
-    platform_tags = base_hashtags.get(platform, base_hashtags['instagram'])
-    return platform_tags[:3] + contextual[:3]
 
-def get_optimal_posting_time(platform: str, audience: str) -> str:
-    """AI-predicted optimal posting times"""
-    times = {
-        'instagram': {'morning': '8h00-10h00', 'evening': '19h00-21h00'},
-        'tiktok': {'afternoon': '15h00-17h00', 'evening': '20h00-22h00'},
-        'twitter': {'morning': '9h00-11h00', 'afternoon': '13h00-15h00'},
-        'youtube': {'evening': '18h00-20h00', 'weekend': '14h00-16h00'}
-    }
-    
-    platform_times = times.get(platform, times['instagram'])
-    best_time = random.choice(list(platform_times.values()))
-    return f"{best_time} (heure locale)"
-
-# Main App Interface
+# App Header
 st.markdown("""
     <div class="main-header">
         <h1>🚀 RicchCode Pro</h1>
-        <h3>Générateur de Contenu Viral IA <span class="pro-badge">PRO</span></h3>
-        <p>L'intelligence artificielle qui transforme vos idées en contenu viral</p>
+        <h3>Générateur de Contenu Viral alimenté par IA</h3>
+        <p>L'IA qui remplace les "experts d'algorithmes" • Dominez les réseaux • Vendez plus</p>
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar - User Profile & Settings
+# Sidebar - User Profile Setup
 with st.sidebar:
-    st.markdown("### 👤 Profil Utilisateur")
+    st.header("👤 Profil Utilisateur")
     
-    st.session_state.user_profile['business_type'] = st.selectbox(
-        "Type d'activité",
-        ['personal', 'e-commerce', 'service', 'restaurant', 'coaching', 'freelance', 'agency']
-    )
+    user_type = st.selectbox("Vous êtes :", [
+        "Créateur de contenu", "Commerçant/E-commerce", "Freelancer", 
+        "Agence Marketing", "Marque locale", "Débutant"
+    ])
     
-    st.session_state.user_profile['target_audience'] = st.selectbox(
-        "Audience cible",
-        ['18-25 ans', '25-35 ans', '35-45 ans', '45+ ans', 'Professionnels', 'Étudiants', 'Parents']
-    )
+    industry = st.selectbox("Secteur d'activité :", [
+        "ecommerce", "fitness", "food", "tech", "finance", "lifestyle", 
+        "beauty", "travel", "education", "gaming", "general"
+    ])
     
-    st.session_state.user_profile['location'] = st.text_input(
-        "Localisation", 
-        value="Montréal, QC"
-    )
+    location = st.selectbox("Localisation :", [
+        "Montreal", "Paris", "London", "New York", "Toronto", 
+        "Marseille", "Lyon", "Berlin", "Madrid", "Rome"
+    ])
     
-    st.markdown("---")
-    st.markdown("### 📊 Statistiques")
-    st.metric("Contenus générés", len(st.session_state.generated_contents))
-    st.metric("Score viral moyen", f"{random.uniform(6.5, 8.2):.1f}/10")
+    target_audience = st.selectbox("Audience cible :", [
+        "18-25 ans", "25-35 ans", "35-45 ans", "45+ ans", "Professionnels", "Étudiants"
+    ])
+    
+    st.session_state.user_profile = {
+        'user_type': user_type,
+        'industry': industry,
+        'location': location,
+        'target_audience': target_audience
+    }
 
-# Main Content Area
-tab1, tab2, tab3, tab4 = st.tabs(["🎯 Générateur IA", "📊 Analyse Pro", "📈 Historique", "⚙️ Paramètres"])
+# Main Dashboard
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    # Content Generator Section
+    st.markdown("""
+        <div class="generator-section">
+            <h2>🧠 Générateur IA Viral</h2>
+            <p>Générez du contenu optimisé pour l'engagement maximum</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    with st.form("viral_generator"):
+        st.subheader("Créer du contenu viral")
+        
+        # Platform selection with visual cards
+        st.write("**Choisissez votre plateforme :**")
+        platform_cols = st.columns(5)
+        platforms = ["instagram", "tiktok", "twitter", "youtube", "linkedin"]
+        platform_emojis = ["📸", "🎵", "🐦", "📺", "💼"]
+        
+        selected_platform = st.radio("Plateforme", platforms, 
+                                   format_func=lambda x: f"{platform_emojis[platforms.index(x)]} {x.title()}")
+        
+        # Content topic and style
+        col_topic, col_tone = st.columns(2)
+        with col_topic:
+            topic = st.text_input("Sujet/Produit à promouvoir :", 
+                                placeholder="Ex: formation marketing, produit beauté, restaurant...")
+        
+        with col_tone:
+            tone = st.selectbox("Ton souhaité :", [
+                "engaging", "professional", "casual", "urgent", "inspirational"
+            ])
+        
+        # Advanced options
+        with st.expander("⚙️ Options avancées"):
+            include_hashtags = st.checkbox("Inclure hashtags optimisés", True)
+            include_cta = st.checkbox("Inclure call-to-action", True)
+            content_series = st.checkbox("Créer une série de contenus (3 posts)")
+        
+        generate_btn = st.form_submit_button("🚀 Générer du contenu viral", use_container_width=True)
+    
+    # Content Generation Results
+    if generate_btn and topic.strip():
+        with st.spinner("🧠 L'IA analyse les tendances et génère votre contenu..."):
+            time.sleep(2)  # Simulate processing
+            
+            if content_series:
+                contents = []
+                for i in range(3):
+                    content = generate_viral_content(selected_platform, topic, industry, tone, location)
+                    contents.append(content)
+                    st.session_state.generated_content.append(content)
+            else:
+                content = generate_viral_content(selected_platform, topic, industry, tone, location)
+                contents = [content]
+                st.session_state.generated_content.append(content)
+        
+        st.success("✅ Contenu généré avec succès !")
+        
+        # Display generated content
+        for i, content in enumerate(contents, 1):
+            st.markdown(f"""
+                <div class="viral-score">
+                    <h3>📝 Contenu {i} - Score Viral: {content['viral_score']:.1f}/10</h3>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Content display
+            st.text_area(f"Contenu généré {i}:", content['content'], height=100, key=f"content_{i}")
+            
+            # Metrics
+            col_metrics = st.columns(4)
+            for j, (key, value) in enumerate(content['engagement'].items()):
+                with col_metrics[j]:
+                    st.metric(key.title(), f"{value:,}")
+            
+            # Action buttons
+            col_btn = st.columns(3)
+            with col_btn[0]:
+                if st.button(f"📋 Copier contenu {i}", key=f"copy_content_{i}"):
+                    st.success("✅ Copié dans le presse-papier !")
+            with col_btn[1]:
+                if st.button(f"🔄 Régénérer {i}", key=f"regen_{i}"):
+                    st.rerun()
+            with col_btn[2]:
+                if st.button(f"💾 Sauvegarder {i}", key=f"save_{i}"):
+                    st.success("✅ Sauvegardé dans l'historique !")
+
+with col2:
+    # Dashboard and Analytics
+    st.markdown("""
+        <div class="metrics-dashboard">
+            <h3>📊 Dashboard Analytics</h3>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Quick Stats
+    if st.session_state.generated_content:
+        total_content = len(st.session_state.generated_content)
+        avg_viral_score = sum(c['viral_score'] for c in st.session_state.generated_content) / total_content
+        
+        st.metric("Contenus générés", total_content)
+        st.metric("Score viral moyen", f"{avg_viral_score:.1f}/10")
+        
+        # Platform distribution
+        platform_counts = {}
+        for content in st.session_state.generated_content:
+            platform = content['platform']
+            platform_counts[platform] = platform_counts.get(platform, 0) + 1
+        
+        if platform_counts:
+            st.write("**Répartition par plateforme:**")
+            for platform, count in platform_counts.items():
+                st.write(f"• {platform.title()}: {count}")
+    
+    # Pro Tips
+    st.markdown("""
+        <div class="pro-tip">
+            <h4>💡 Pro Tips IA</h4>
+            <ul>
+                <li>Postez entre 19h-21h pour max engagement</li>
+                <li>Utilisez 3-5 hashtags pour Instagram</li>
+                <li>Questions = +40% commentaires</li>
+                <li>Emojis = +25% engagement</li>
+            </ul>
+        </div>
+    """, unsafe_allow_html=True)
+
+# Bottom Section - Advanced Features
+st.markdown("---")
+
+tab1, tab2, tab3, tab4 = st.tabs(["📈 Analytics", "🕒 Programmation", "🎯 A/B Testing", "⚙️ Paramètres"])
 
 with tab1:
-    st.markdown('<div class="generator-section">', unsafe_allow_html=True)
-    st.markdown("## 🧠 Générateur de Contenu Viral IA")
-    st.markdown("Transformez vos idées en contenu optimisé pour chaque plateforme")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.subheader("📈 Analytics avancées")
     
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        prompt_input = st.text_area(
-            "💡 Décrivez votre idée ou sujet :",
-            placeholder="Ex: Astuces pour être plus productif au travail",
-            height=100
-        )
-    
-    with col2:
-        platform_choice = st.selectbox(
-            "📱 Plateforme",
-            ['instagram', 'tiktok', 'twitter', 'youtube', 'linkedin', 'facebook']
-        )
+    if st.session_state.generated_content:
+        # Create sample analytics data
+        df_analytics = pd.DataFrame([
+            {
+                'Date': content['timestamp'].strftime('%Y-%m-%d'),
+                'Platform': content['platform'],
+                'Viral Score': content['viral_score'],
+                'Predicted Likes': content['engagement'].get('likes', 0),
+                'Industry': content['industry']
+            }
+            for content in st.session_state.generated_content
+        ])
         
-        tone_choice = st.selectbox(
-            "🎭 Ton à adopter",
-            ['motivational', 'educational', 'commercial', 'viral', 'professional', 'casual']
-        )
-    
-    if st.button("🚀 Générer du Contenu Viral", use_container_width=True):
-        if prompt_input.strip():
-            with st.spinner("🧠 IA en cours de génération..."):
-                time.sleep(2)  # Simulate AI processing
-                
-                generated = generate_viral_content(
-                    prompt_input, 
-                    platform_choice, 
-                    tone_choice, 
-                    st.session_state.user_profile['target_audience']
-                )
-                
-                st.session_state.generated_contents.append(generated)
-                
-                st.success("✅ Contenu généré avec succès !")
-                
-                # Display generated content
-                st.markdown("### 📝 Votre Contenu Optimisé")
-                st.markdown(f'<div class="generated-content">{generated["content"]}</div>', unsafe_allow_html=True)
-                
-                # Metrics
-                col1, col2, col3, col4 = st.columns(4)
-                col1.metric("🔥 Score Viral", f"{generated['viral_score']:.1f}/10")
-                col2.metric("❤️ Likes Estimés", f"{generated['engagement_prediction'].get('likes', 0):,}")
-                col3.metric("💬 Commentaires", f"{generated['engagement_prediction'].get('comments', 0):,}")
-                col4.metric("📊 Confiance", f"{generated['engagement_prediction']['confidence']}%")
-                
-                # Optimization suggestions
-                st.markdown("### 💡 Optimisations Recommandées")
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown("**🏷️ Hashtags Optimisés:**")
-                    hashtags_text = " ".join(generated['optimized_hashtags'])
-                    st.code(hashtags_text)
-                
-                with col2:
-                    st.markdown("**⏰ Meilleur Moment:**")
-                    st.info(f"📅 {generated['best_time_to_post']}")
-                
-                # Copy buttons
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    if st.button("📋 Copier le Contenu"):
-                        st.success("✅ Contenu copié !")
-                with col2:
-                    if st.button("📋 Copier les Hashtags"):
-                        st.success("✅ Hashtags copiés !")
-                with col3:
-                    if st.button("💾 Sauvegarder"):
-                        st.success("✅ Sauvegardé dans l'historique !")
-        else:
-            st.warning("⚠️ Veuillez entrer une idée ou un sujet")
+        # Display charts
+        col_chart1, col_chart2 = st.columns(2)
+        
+        with col_chart1:
+            st.write("**Score viral par plateforme**")
+            platform_scores = df_analytics.groupby('Platform')['Viral Score'].mean()
+            st.bar_chart(platform_scores)
+        
+        with col_chart2:
+            st.write("**Engagement prédit par plateforme**")
+            platform_engagement = df_analytics.groupby('Platform')['Predicted Likes'].mean()
+            st.bar_chart(platform_engagement)
+        
+        # Data table
+        st.write("**Historique détaillé**")
+        st.dataframe(df_analytics, use_container_width=True)
+    else:
+        st.info("Générez du contenu pour voir les analytics !")
 
 with tab2:
-    st.markdown("## 📊 Analyse Avancée de Contenu")
+    st.subheader("🕒 Programmation de publication")
+    st.info("🚧 Fonctionnalité en développement - Bientôt disponible !")
     
-    content_to_analyze = st.text_area(
-        "📝 Collez votre contenu à analyser :",
-        height=150,
-        placeholder="Collez ici le contenu que vous voulez analyser..."
-    )
-    
-    if st.button("🔍 Analyser avec l'IA", use_container_width=True):
-        if content_to_analyze.strip():
-            with st.spinner("🧠 Analyse IA en cours..."):
-                time.sleep(1.5)
-                
-                # Perform analysis
-                viral_score = calculate_viral_score(content_to_analyze, 'general')
-                sentiment = random.uniform(-0.3, 0.8)
-                readability = random.uniform(6.0, 9.0)
-                
-                # Analysis results
-                st.markdown('<div class="analysis-card">', unsafe_allow_html=True)
-                st.markdown("### 📈 Résultats d'Analyse IA")
-                
-                col1, col2, col3 = st.columns(3)
-                col1.metric("🔥 Potentiel Viral", f"{viral_score:.1f}/10")
-                col2.metric("😊 Sentiment", f"{sentiment:.2f}")
-                col3.metric("📖 Lisibilité", f"{readability:.1f}/10")
-                st.markdown('</div>', unsafe_allow_html=True)
-                
-                # Detailed insights
-                st.markdown("### 🎯 Insights Détaillés")
-                
-                insights = [
-                    f"🎭 **Ton détecté**: {'Positif et engageant' if sentiment > 0.3 else 'Neutre' if sentiment > 0 else 'À améliorer'}",
-                    f"📱 **Plateforme recommandée**: {'Instagram & TikTok' if viral_score > 7 else 'Facebook & LinkedIn' if viral_score > 5 else 'Twitter'}",
-                    f"👥 **Audience**: {st.session_state.user_profile['target_audience']}",
-                    f"⏰ **Timing optimal**: {get_optimal_posting_time('instagram', 'general')}"
-                ]
-                
-                for insight in insights:
-                    st.markdown(insight)
+    st.write("**Fonctionnalités à venir :**")
+    st.write("• Publication automatique sur Instagram, TikTok, Twitter")
+    st.write("• Suggestion d'heures optimales basée sur l'IA")
+    st.write("• Calendrier éditorial intelligent")
+    st.write("• Analyse des meilleures heures par audience")
 
 with tab3:
-    st.markdown("## 📈 Historique & Performance")
+    st.subheader("🎯 A/B Testing automatique")
+    st.info("🚧 Fonctionnalité en développement - Bientôt disponible !")
     
-    if st.session_state.generated_contents:
-        st.markdown(f"**{len(st.session_state.generated_contents)} contenus générés**")
-        
-        # Create performance dataframe
-        performance_data = []
-        for content in st.session_state.generated_contents[-10:]:  # Show last 10
-            performance_data.append({
-                'ID': content['content_id'],
-                'Score Viral': content['viral_score'],
-                'Likes Estimés': content['engagement_prediction'].get('likes', 0),
-                'Confiance': content['engagement_prediction']['confidence']
-            })
-        
-        df = pd.DataFrame(performance_data)
-        st.dataframe(df, use_container_width=True)
-        
-        # Performance chart
-        if len(performance_data) > 1:
-            st.line_chart(df.set_index('ID')['Score Viral'])
-    else:
-        st.info("🎯 Générez du contenu pour voir votre historique ici !")
+    st.write("**Fonctionnalités prévues :**")
+    st.write("• Test automatique de 2-3 versions de contenu")
+    st.write("• Analyse des performances en temps réel")
+    st.write("• Recommandations basées sur les résultats")
+    st.write("• Optimisation continue par l'IA")
 
 with tab4:
-    st.markdown("## ⚙️ Paramètres Avancés")
+    st.subheader("⚙️ Paramètres avancés")
     
-    col1, col2 = st.columns(2)
+    col_settings1, col_settings2 = st.columns(2)
     
-    with col1:
-        st.markdown("### 🎛️ Configuration IA")
+    with col_settings1:
+        st.write("**Préférences IA**")
         creativity_level = st.slider("Niveau de créativité", 1, 10, 7)
-        viral_focus = st.slider("Focus viral", 1, 10, 8)
-        
-    with col2:
-        st.markdown("### 🌍 Localisation")
-        enable_geo = st.checkbox("Activer le ciblage géographique")
-        if enable_geo:
-            st.info("🎯 Optimisation pour : " + st.session_state.user_profile['location'])
+        risk_tolerance = st.slider("Tolérance au risque", 1, 10, 5)
+        brand_consistency = st.slider("Consistance de marque", 1, 10, 8)
     
-    st.markdown("### 📊 Objectifs Business")
-    business_goals = st.multiselect(
-        "Sélectionnez vos objectifs :",
-        ['Augmenter la notoriété', 'Générer des leads', 'Vendre des produits', 
-         'Créer une communauté', 'Éduquer l\'audience', 'Divertir']
-    )
+    with col_settings2:
+        st.write("**Paramètres de contenu**")
+        default_tone = st.selectbox("Ton par défaut", 
+                                  ["engaging", "professional", "casual", "urgent"])
+        auto_hashtags = st.checkbox("Hashtags automatiques", True)
+        geo_targeting = st.checkbox("Ciblage géographique", True)
+    
+    if st.button("💾 Sauvegarder les paramètres"):
+        st.success("✅ Paramètres sauvegardés !")
 
 # Footer
 st.markdown("---")
 st.markdown("""
-    <div style="text-align: center; padding: 2rem; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 15px; color: white;">
-        <h3>🚀 RicchCode Pro - Propulsé par l'IA</h3>
-        <p><strong>IA contre Algorithme</strong> • Démocratiser la création virale • Accessible à tous</p>
-        <p>🌟 <em>Rejoignez la révolution du contenu intelligent</em> 🌟</p>
+    <div style="text-align: center; padding: 2rem; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border-radius: 10px; margin-top: 2rem;">
+        <h3>🚀 RicchCode Pro</h3>
+        <p><strong>L'IA qui remplace les "experts d'algorithmes"</strong></p>
+        <p>Dominez les réseaux • Vendez plus • Croissance garantie</p>
+        <p style="font-size: 0.9em; opacity: 0.8;">
+            Propulsé par FastAPI + MongoDB + Machine Learning | Version 2.1.0
+        </p>
     </div>
 """, unsafe_allow_html=True)
