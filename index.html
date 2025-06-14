@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RicchCode Pro - Créateur de Contenu Viral IA</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcf7f);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --success: #6bcf7f;
+      --warning: #ffd93d;
+      --error: #ff6b6b;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary-gradient);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* Background Animation */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(107, 207, 127, 0.3) 0%, transparent 50%);
+      animation: backgroundPulse 8s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+
+    @keyframes backgroundPulse {
+      0% { opacity: 0.5; }
+      100% { opacity: 0.8; }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: slideInDown 1s ease-out;
+    }
+
+    .header h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: var(--secondary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      animation: textGlow 3s ease-in-out infinite alternate;
+    }
+
+    .header .subtitle {
+      font-size: 1.3rem;
+      font-weight: 300;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    .header .stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--warning);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Navigation */
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-tab {
+      padding: 1rem 2rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .nav-tab:hover, .nav-tab.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    /* Content Sections */
+    .content-section {
+      display: none;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    /* Status Card */
+    .status-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow);
+      animation: slideInUp 1s ease-out;
+    }
+
+    .status-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .status-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      box-shadow: 0 0 20px currentColor;
+    }
+
+    .status-indicator.loading { background: var(--warning); }
+    .status-indicator.connected { background: var(--success); }
+    .status-indicator.error { background: var(--error); }
+
+    .reconnect-btn {
+      padding: 0.5rem 1rem;
+      background: var(--secondary-gradient);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+    }
+
+    .reconnect-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Generator Card */
+    .generator-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow);
+      animation: slideInLeft 1s ease-out;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      background: var(--secondary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 1.2rem 2rem;
+      background: var(--secondary-gradient);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .generate-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .generate-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Output Card */
+    .output-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow);
+      animation: slideInRight 1s ease-out;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .output-content {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      border-left: 4px solid var(--success);
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-family: 'Monaco', 'Consolas', monospace;
+    }
+
+    .output-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--glass-border);
+      border-radius: 25px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .feature-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: var(--secondary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .feature-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .feature-description {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Loading Animation */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes textGlow {
+      0% { text-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
+      100% { text-shadow: 0 0 50px rgba(255, 255, 255, 0.8); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .nav-tabs {
+        gap: 0.5rem;
+      }
+      
+      .nav-tab {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+      }
+      
+      .header .stats {
+        gap: 2rem;
+      }
+      
+      .status-display {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1><i class="fas fa-fire"></i> RicchCode Pro</h1>
+      <p class="subtitle">Créateur de Contenu Viral alimenté par l'Intelligence Artificielle</p>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-number" id="contentGenerated">1,247</div>
+          <div class="stat-label">Contenus Créés</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4.8/5</div>
+          <div class="stat-label">Note Utilisateurs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">99.9%</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" data-tab="generator">
+        <i class="fas fa-magic"></i> Générateur
+      </div>
+      <div class="nav-tab" data-tab="history">
+        <i class="fas fa-history"></i> Historique
+      </div>
+      <div class="nav-tab" data-tab="analytics">
+        <i class="fas fa-chart-line"></i> Analytics
+      </div>
+      <div class="nav-tab" data-tab="features">
+        <i class="fas fa-star"></i> Fonctionnalités
+      </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="status-card">
+      <div class="status-display">
+        <div class="status-info">
+          <div class="status-indicator loading" id="statusIndicator"></div>
+          <div>
+            <strong>Backend Status:</strong>
+            <span id="status">Vérification de la connexion...</span>
+          </div>
+        </div>
+        <button class="reconnect-btn" id="reconnectBtn" onclick="checkBackendStatus()">
+          <i class="fas fa-sync-alt"></i> Reconnexion
+        </button>
+      </div>
+    </div>
+
+    <!-- Generator Section -->
+    <div class="content-section active" id="generator">
+      <div class="main-grid">
+        <!-- Generator Card -->
+        <div class="generator-card">
+          <div class="card-header">
+            <i class="fas fa-robot card-icon"></i>
+            <h2 class="card-title">Générateur de Contenu</h2>
+          </div>
+          
+          <form id="contentForm">
+            <div class="form-group">
+              <label class="form-label" for="contentType">
+                <i class="fas fa-list"></i> Type de Contenu
+              </label>
+              <select class="form-select" id="contentType" name="contentType">
+                <option value="post">📱 Post Instagram</option>
+                <option value="tiktok">🎵 Script TikTok</option>
+                <option value="youtube">🎥 Script YouTube</option>
+                <option value="twitter">🐦 Thread Twitter</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="topic">
+                <i class="fas fa-lightbulb"></i> Sujet/Thème
+              </label>
+              <input type="text" class="form-input" id="topic" name="topic" 
+                     placeholder="Ex: Intelligence Artificielle, Motivation, Entrepreneuriat..." required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="audience">
+                <i class="fas fa-users"></i> Audience Cible
+              </label>
+              <input type="text" class="form-input" id="audience" name="audience" 
+                     placeholder="Ex: 18-35 ans, entrepreneurs, étudiants...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="description">
+                <i class="fas fa-edit"></i> Description/Contexte
+              </label>
+              <textarea class="form-textarea" id="description" name="description" rows="4"
+                        placeholder="Ajoutez des détails spécifiques, votre angle d'approche, ou des éléments à inclure..."></textarea>
+            </div>
+
+            <button type="submit" class="generate-btn" id="generateBtn">
+              <span id="btnText">
+                <i class="fas fa-sparkles"></i> Générer du Contenu Viral
+              </span>
+              <div id="btnLoader" class="spinner" style="display: none;"></div>
+            </button>
+          </form>
+        </div>
+
+        <!-- Output Card -->
+        <div class="output-card">
+          <div class="card-header">
+            <i class="fas fa-file-alt card-icon"></i>
+            <h2 class="card-title">Contenu Généré</h2>
+          </div>
+          
+          <div id="outputPlaceholder" style="text-align: center; padding: 3rem; opacity: 0.6;">
+            <i class="fas fa-rocket" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <p>Votre contenu viral apparaîtra ici...</p>
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Remplissez le formulaire et cliquez sur "Générer"</p>
+          </div>
+          
+          <div id="outputContainer" style="display: none;">
+            <div class="output-content" id="generatedContent"></div>
+            <div class="output-actions">
+              <button class="action-btn" onclick="copyContent()">
+                <i class="fas fa-copy"></i> Copier
+              </button>
+              <button class="action-btn" onclick="downloadContent()">
+                <i class="fas fa-download"></i> Télécharger
+              </button>
+              <button class="action-btn" onclick="shareContent()">
+                <i class="fas fa-share"></i> Partager
+              </button>
+              <button class="action-btn" onclick="saveToHistory()">
+                <i class="fas fa-bookmark"></i> Sauvegarder
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="content-section" id="history">
+      <div class="generator-card">
+        <div class="card-header">
+          <i class="fas fa-history card-icon"></i>
+          <h2 class="card-title">Historique des Contenus</h2>
+        </div>
+        <div id="historyContainer">
+          <p style="text-align: center; opacity: 0.6; padding: 2rem;">
+            <i class="fas fa-clock" style="font-size: 2rem; display: block; margin-bottom: 1rem;"></i>
+            Aucun contenu sauvegardé pour le moment
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Section -->
+    <div class="content-section" id="analytics">
+      <div class="generator-card">
+        <div class="card-header">
+          <i class="fas fa-chart-line card-icon"></i>
+          <h2 class="card-title">Analytics & Performance</h2>
+        </div>
+        <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+          <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+          <p>Statistiques de performance à venir...</p>
+          <p style="font-size: 0.9rem; margin-top: 0.5rem;">Analysez l'engagement de vos contenus</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="content-section" id="features">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3 class="feature-title">Génération IA Avancée</h3>
+          <p class="feature-description">
+            Algorithmes d'IA entraînés sur millions de contenus viraux pour créer du contenu optimisé et engageant.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Analytics Intégrées</h3>
+          <p class="feature-description">
+            Suivez les performances de vos contenus avec des métriques détaillées et des insights actionnables.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 class="feature-title">Multi-Plateforme</h3>
+          <p class="feature-description">
+            Optimisez automatiquement vos contenus pour Instagram, TikTok, YouTube, Twitter et plus encore.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Génération Rapide</h3>
+          <p class="feature-description">
+            Créez du contenu viral en quelques secondes grâce à notre infrastructure cloud optimisée.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3 class="feature-title">Templates Personnalisés</h3>
+          <p class="feature-description">
+            Bibliothèque de templates professionnels adaptés à votre niche et style de contenu.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3 class="feature-title">100% Sécurisé</h3>
+          <p class="feature-description">
+            Vos données sont protégées avec un chiffrement de niveau entreprise et une confidentialité totale.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global Variables
+    let backendConnected = false;
+    let contentHistory = JSON.parse(localStorage.getItem('ricchcode_history') || '[]');
+    let currentContent = null;
+
+    // Initialize Application
+    document.addEventListener('DOMContentLoaded', function() {
+      checkBackendStatus();
+      setupEventListeners();
+      updateStats();
+      loadHistory();
+      
+      // Check backend status every 30 seconds
+      setInterval(checkBackendStatus, 30000);
+      
+      // Update stats every 10 seconds
+      setInterval(updateStats, 10000);
+    });
+
+    // Setup Event Listeners
+    function setupEventListeners() {
+      // Navigation tabs
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+      });
+
+      // Form submission
+      document.getElementById('contentForm').addEventListener('submit', handleFormSubmit);
+    }
+
+    // Tab Switching
+    function switchTab(tabName) {
+      // Update nav tabs
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+      });
+
+      // Update content sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.toggle('active', section.id === tabName);
+      });
+    }
+
+    // Backend Status Check
+    async function checkBackendStatus() {
+      const statusElement = document.getElementById('status');
+      const indicatorElement = document.getElementById('statusIndicator');
+      const reconnectBtn = document.getElementById('reconnectBtn');
+      
+      try {
+        const response = await fetch('http://localhost:8000/', {
+          method: 'GET',
+          timeout: 5000
+        });
+        
+        const data = await response.json();
+        
+        statusElement.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}`;
+        indicatorElement.className = 'status-indicator connected';
+        reconnectBtn.style.display = 'none';
+        backendConnected = true;
+        
+      } catch (error) {
+        statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Backend non connecté - Mode démonstration actif';
+        indicatorElement.className = 'status-indicator error';
+        reconnectBtn.style.display = 'block';
+        backendConnected = false;
+      }
+    }
+
+    // Form Submission Handler
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const generateBtn = document.getElementById('generateBtn');
+      const btnText = document.getElementById('btnText');
+      const btnLoader = document.getElementById('btnLoader');
+      const outputContainer = document.getElementById('outputContainer');
+      const outputPlaceholder = document.getElementById('outputPlaceholder');
+      
+      // Show loading state
+      generateBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnLoader.style.display = 'block';
+      
+      // Get form data
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      
+      try {
+        let content;
+        
+        if (backendConnected) {
+          // Real API call
+          const response = await fetch('http://localhost:8000/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          if (!response.ok) throw new Error('Erreur API');
+          
+          const result = await response.json();
+          content = result.content;
+        } else {
+          // Demo mode
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate delay
+          content = generateDemoContent(data);
+        }
+        
+        // Display content
+        currentContent = { ...data, content, timestamp: new Date().toISOString() };
+        document.getElementById('generatedContent').textContent = content;
+        outputPlaceholder.style.display = 'none';
+        outputContainer.style.display = 'block';
+        
+        // Auto-scroll to output
+        outputContainer.scrollIntoView({ behavior: 'smooth' });
+        
+      } catch (error) {
+        console.error(error);
+        alert('Erreur lors de la génération du contenu.');
+      } finally {
+        // Reset button
+        generateBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+      }
+    }
+
+    // Generate demo content (fallback)
+    function generateDemoContent(data) {
+      return `Contenu viral généré pour ${data.topic} (${data.contentType})`;
+    }
+
+    // Update Stats
+    function updateStats() {
+      const generatedCount = parseInt(document.getElementById('contentGenerated').textContent.replace(/,/g, ''));
+      const newCount = generatedCount + Math.floor(Math.random() * 5); // Random increment
+      document.getElementById('contentGenerated').textContent = newCount.toLocaleString();
+    }
+
+    // Copy to clipboard
+    function copyContent() {
+      const content = document.getElementById('generatedContent').textContent;
+      navigator.clipboard.writeText(content);
+      alert('Contenu copié dans le presse-papiers');
+    }
+
+    // Download content
+    function downloadContent() {
+      const content = document.getElementById('generatedContent').textContent;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'contenu.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Share content
+    function shareContent() {
+      const content = document.getElementById('generatedContent').textContent;
+      if (navigator.share) {
+        navigator.share({ text: content });
+      } else {
+        copyContent();
+      }
+    }
+
+    // Save to history
+    function saveToHistory() {
+      if (!currentContent) return;
+      contentHistory.push(currentContent);
+      localStorage.setItem('ricchcode_history', JSON.stringify(contentHistory));
+      loadHistory();
+      alert('Contenu sauvegardé dans l\'historique');
+    }
+
+    // Load history
+    function loadHistory() {
+      const container = document.getElementById('historyContainer');
+      if (contentHistory.length === 0) {
+        container.innerHTML = '<p style="text-align:center; opacity:0.6; padding:2rem;">Aucun contenu sauvegardé</p>';
+        return;
+      }
+
+      container.innerHTML = contentHistory.map(item => `
+        <div class="output-card" style="margin-bottom:1rem;">
+          <div class="card-header">
+            <i class="fas fa-file-alt card-icon"></i>
+            <h2 class="card-title">${item.contentType} - ${new Date(item.timestamp).toLocaleString('fr-FR')}</h2>
+          </div>
+          <div class="output-content">${item.content}</div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
